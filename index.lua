@@ -705,8 +705,8 @@ function update(dt)
             state = 'rotselect'
         end
     elseif state == 'menu' then
-        local MODE_NUMBER = 1
         local modes = {'script/mode_master.lua', 'script/mode_death.lua'}
+        local MODE_NUMBER = #modes
         if justpressed.down then
             menuselect = menuselect + 1
             if menuselect > MODE_NUMBER then
