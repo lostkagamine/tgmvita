@@ -101,7 +101,5 @@ mode = {
     end,
     draw = function(self, rf, re2)
         fontPrint(font, rf, re2-300, self.grade, colours.GOLD)
-        fontPrint(font, rf, re2-220, g, colours.WHITE)
-        fontPrint(font, rf, re2-250, tostring(self.score), colours.WHITE)
     end
 }
