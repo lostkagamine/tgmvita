@@ -42,7 +42,9 @@ audio = {
     lock = loadSound('lock.wav'),
     place = loadSound('place.wav'),
     ready = loadSound('ready.wav'),
-    go = loadSound('go.wav')
+    go = loadSound('go.wav'),
+    gradeup = loadSound('gradeup.wav'),
+    gameclear = loadSound('gameclear.wav')
 }
 
 pieceaudio = {'I', 'J', 'L', 'S', 'T', 'O', 'Z'}
@@ -205,6 +207,10 @@ function game:initialise(style)
     self.holdPiece = nil
     self.holdAvailable = true
 
+    self.softDropFrames = 0
+
+    self.blockSonic = false
+
     self.levelAddTables = {
         [0] = 0,
         1,
@@ -214,7 +220,7 @@ function game:initialise(style)
     }
 
     if mode and mode.init then
-        mode:init()
+        mode:init(style)
     end
 end
 
@@ -340,6 +346,7 @@ function game:doSoftDrop(dt)
     while self.counters.sdGravity >= 1/60 do
         self.counters.sdGravity = self.counters.sdGravity - 1/60
         if self:isColliding(nil, nil, self.y+1) then break end
+        self.softDropFrames = self.softDropFrames + 1
         self.counters.lock = 0
         self:movePiece(0, 1)
     end
@@ -422,8 +429,10 @@ function game:findLowestY()
 end
 
 function game:sonicDrop()
-    if not self.pieceActive then return end
+    if not self.pieceActive or self.blockSonic then return end
     local ny = self:findLowestY()
+
+    self.softDropFrames = self.softDropFrames + (ny - self.y)
 
     if WORLD_RULE then
         self.counters.lock = self.delays.lock
@@ -455,6 +464,16 @@ function game:lock()
         playSound(audio.lock)
         self.counters.are = self.delays.are
     end
+end
+
+function game:hasPerfectCleared()
+    for y=1,FIELD_HEIGHT+HIDDEN_HEIGHT,1 do
+        for x=1,FIELD_WIDTH do
+            local ft = FIELD[y][x]
+            if ft ~= 0 then return false end
+        end
+    end
+    return true
 end
 
 function game:shiftDownTimer(dt)
@@ -535,6 +554,7 @@ function game:nextPiece(held)
     self.counters.are = 0
     self.counters.arr = 0
     self.counters.gravity = 0
+    self.softDropFrames = 0
     self.holdAvailable = true
 
     if not held then
@@ -558,9 +578,11 @@ function game:nextPiece(held)
         playSound(ps) 
     end
 
-    if self:isColliding() then
+    if self:isColliding(nil, 3, HIDDEN_HEIGHT-1) then
         self:gameOver()
     end
+
+    self:doGravity(0)
 end
 
 function game:gameOver()
@@ -624,9 +646,6 @@ function game:incrementLevel(lvls, lines)
     if self.level == self.endlevel - 1 and self.lines == 0 then return end
     if self.level % 100 ~= 99 or lines ~= 0 then
         self.level = self.level + lvls
-    end
-    if self.level >= self.endlevel then
-        self:gameOver()
     end
 
     if mode and mode.setDelays then
@@ -911,6 +930,10 @@ function draw(dt)
 
         if game.dead then
             pstring('GAME OVER', 200)
+        end
+
+        if mode and mode.draw then
+            mode:draw(re+20, re2)
         end
     end
 
