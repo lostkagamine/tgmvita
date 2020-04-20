@@ -357,6 +357,10 @@ function game:movePiece(ex, ey)
     if not self:isColliding(nil, tx, ty) then
         self.x, self.y = tx, ty
     end
+
+    if WORLD_RULE then
+        self.counters.lock = 0
+    end
 end
 
 function game:isColliding(piece, px, py)
@@ -632,8 +636,11 @@ function game:rotate(dir)
         self.y = self.y + my
     end
     self.rotationstate = provstate
-    self.lastAction = 'rotate'
     --self.counters.lock = 0
+
+    if WORLD_RULE then
+        self.counters.lock = 0
+    end
 end
 
 function game:hasBlock(x, y)
