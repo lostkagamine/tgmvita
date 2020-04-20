@@ -45,18 +45,27 @@ local daslevels = {
     200, 300, 400, 99999
 }
 
+local clears = {
+    12, 6, 5, 4
+}
+
+local clearlevels = {
+    101, 401, 500, 99999
+}
+
 mode = {
     init = function(self, style)
         game.delays.are = 18 * (1/60)
         game.delays.das = 12 * (1/60)
         game.delays.lock = 30 * (1/60)
         game.delays.lare = 14 * (1/60)
-        game.delays.clear = 41 * (1/60)
+        game.delays.clear = 12 * (1/60)
         game.delays.gravity = 20
         self.lockptr = 1
         self.areptr = 1
         self.lareptr = 1
         self.dasptr = 1
+        self.clearptr = 1
 
         self.grade = ""
     end,
@@ -95,6 +104,11 @@ mode = {
             self.dasptr = self.dasptr + 1
         end
         game.delays.das = dases[self.dasptr] * (1/60)
+
+        if game.level >= clearlevels[self.clearptr] then
+            self.clearptr = self.clearptr + 1
+        end
+        game.delays.das = clears[self.clearptr] * (1/60)
     end,
     clear = function(self, lines)
 
