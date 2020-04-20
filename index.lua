@@ -36,20 +36,20 @@ WORLD_RULE = false
 REVERSE_ROTATIONS = false
 
 audio = {
-    irs = loadSound('irs.ogg'),
-    fall = loadSound('fall.ogg'),
-    clear = loadSound('clear.ogg'),
-    lock = loadSound('lock.ogg'),
-    place = loadSound('place.ogg'),
-    ready = loadSound('ready.ogg'),
-    go = loadSound('go.ogg'),
-    gradeup = loadSound('gradeup.ogg'),
-    gameclear = loadSound('gameclear.ogg')
+    irs = loadSound('irs.wav'),
+    fall = loadSound('fall.wav'),
+    clear = loadSound('clear.wav'),
+    lock = loadSound('lock.wav'),
+    place = loadSound('place.wav'),
+    ready = loadSound('ready.wav'),
+    go = loadSound('go.wav'),
+    gradeup = loadSound('gradeup.wav'),
+    gameclear = loadSound('gameclear.wav')
 }
 
 pieceaudio = {'I', 'J', 'L', 'S', 'T', 'O', 'Z'}
 for _, i in ipairs(pieceaudio) do
-    pieceaudio[i] = loadSound('piece/'..i..'.ogg')
+    pieceaudio[i] = loadSound('piece/'..i..'.wav')
 end
 
 FONT_SIZE = 36
