@@ -62,6 +62,10 @@ mode = {
     end,
     setDelays = function(self)
         if self.grade == "" and game.level >= 500 then
+            if cTimer.getTime(game.timer) > 205000 then
+                game:gameOver()
+                return
+            end
             self.grade = "M"
             playSound(audio.gradeup)
         end
