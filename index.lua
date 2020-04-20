@@ -439,14 +439,14 @@ function game:sonicDrop()
     self.softDropFrames = self.softDropFrames + (ny - self.y)
 
     if WORLD_RULE then
-        self.counters.lock = self.delays.lock
+        self.y = ny
+        self:lock()
     else
         if ny ~= self.y then
             self.counters.lock = 0
         end
+        self.y = ny
     end
-
-    self.y = ny
 end
 
 function game:lock()
