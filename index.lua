@@ -706,7 +706,7 @@ function update(dt)
         end
     elseif state == 'menu' then
         local MODE_NUMBER = 1
-        local modes = {'script/mode_master.lua'}
+        local modes = {'script/mode_master.lua', 'script/mode_death.lua'}
         if justpressed.down then
             menuselect = menuselect + 1
             if menuselect > MODE_NUMBER then
@@ -948,7 +948,8 @@ function draw(dt)
 
     if state == 'menu' then
         local f = {
-            'Master'
+            'Master',
+            'T.A. Death'
         }
         for i, j in ipairs(f) do
             pstring(j, 125 + (i * (FONT_SIZE + 3)), ternary(menuselect == i, colours.GOLD, colours.WHITE))
