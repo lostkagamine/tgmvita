@@ -195,6 +195,7 @@ function game:initialise(style)
     self.drawGhost = true
 
     self.level = 0
+    self.currsection = 1
     self.endlevel = 999
 
     self.gamestyle = style
@@ -203,6 +204,18 @@ function game:initialise(style)
 
     self.holdPiece = nil
     self.holdAvailable = true
+
+    self.levelAddTables = {
+        [0] = 0,
+        1,
+        2,
+        3,
+        4
+    }
+
+    if mode and mode.init then
+        mode:init()
+    end
 end
 
 function game:generatePiece()
@@ -428,8 +441,13 @@ function game:lock()
     self:placePieceOnField()
     local lines = self:clearLines()
     self.lines = self.lines + lines
+    if mode and mode.clear then
+        mode:clear(lines)
+    end
+
     if lines >= 1 then
         playSound(audio.clear)
+        self:incrementLevel(self.levelAddTables[lines], lines)
         self.clearing = true
         self.counters.clear = self.delays.clear
         self:shiftDownTimer(0) -- 0-shift special case
@@ -519,6 +537,10 @@ function game:nextPiece(held)
     self.counters.gravity = 0
     self.holdAvailable = true
 
+    if not held then
+        self:incrementLevel(1, 0)
+    end
+
     if buttons.hold and not held then
         self:hold()
     end
@@ -548,7 +570,7 @@ function game:gameOver()
 end
 
 function game:hold()
-    if not self.holdAvailable or self.gamestyle ~= 'extended' then return end
+    if not self.holdAvailable or self.gamestyle ~= 'extended' or not self.pieceActive then return end
     if self.holdPiece == nil then
         self.holdPiece = self.piece
         self.pieceActive = false
@@ -598,6 +620,20 @@ function game:hasBlock(x, y)
     return e[x] ~= 0
 end
 
+function game:incrementLevel(lvls, lines)
+    if self.level == self.endlevel - 1 and self.lines == 0 then return end
+    if self.level % 100 ~= 99 or lines ~= 0 then
+        self.level = self.level + lvls
+    end
+    if self.level >= self.endlevel then
+        self:gameOver()
+    end
+
+    if mode and mode.setDelays then
+        mode:setDelays()
+    end
+end
+
 menuselect = 1
 game_style = 'classic'
 
@@ -641,7 +677,22 @@ function update(dt)
             state = 'rotselect'
         end
     elseif state == 'menu' then
+        local MODE_NUMBER = 1
+        local modes = {'script/mode_master.lua'}
+        if justpressed.down then
+            menuselect = menuselect + 1
+            if menuselect > MODE_NUMBER then
+                menuselect = 1
+            end
+        end
+        if justpressed.up then
+            menuselect = menuselect - 1
+            if menuselect < 1 then
+                menuselect = MODE_NUMBER
+            end
+        end
         if justpressed.rotateright then
+            adofile(modes[menuselect])
             game:initialise(game_style)
             duringCountdown = true
             state = 'game'
@@ -738,6 +789,13 @@ function draw(dt)
         local ms = padstart(string.sub(tostring(math.floor(tt % 1000)), 1, 2), 2, '0')
         local timer = string.format('%02d:%02d:%s', min, sec, ms)
         fontPrint(font, re+20, re2-60, timer, ternary(cTimer.isPlaying(game.timer), colours.WHITE, newColour(100, 100, 100)))
+
+        fontPrint(font, re+20, re2-150, padstart(tostring(game.level), 3, '0'), colours.WHITE)
+        local cs = (math.floor(game.level / 100)+1) * 100
+        if cs > game.endlevel then
+            cs = game.endlevel
+        end
+        fontPrint(font, re+20, re2-120, padstart(tostring(cs), 3, '0'), colours.WHITE)
 
         local renderfield = deepcopy(FIELD)
         if game.pieceActive and game.running then
@@ -857,7 +915,12 @@ function draw(dt)
     end
 
     if state == 'menu' then
-        pstring('Push X', 325)
+        local f = {
+            'Master'
+        }
+        for i, j in ipairs(f) do
+            pstring(j, 125 + (i * (FONT_SIZE + 3)), ternary(menuselect == i, colours.GOLD, colours.WHITE))
+        end
     end
 
     if state == 'rotselect' then
