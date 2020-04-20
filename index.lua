@@ -650,7 +650,9 @@ function game:hasBlock(x, y)
 end
 
 function game:incrementLevel(lvls, lines)
-    if self.level == self.endlevel - 1 and self.lines == 0 then return end
+    local sl = math.min(self.level, self.endlevel)
+    self.level = sl
+    if self.level == self.endlevel-1 and lines == 0 then return end
     if self.level % 100 ~= 99 or lines ~= 0 then
         self.level = self.level + lvls
     end
