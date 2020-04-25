@@ -27,7 +27,7 @@ mode = {
         game.delays.lock = 30 * (1/60)
         game.delays.lare = game.delays.are
         game.delays.clear = 41 * (1/60)
-        game.delays.gravity = 4/128
+        game.delays.gravity = 4/256
         self.pointer = 1
 
         self.combo = 1

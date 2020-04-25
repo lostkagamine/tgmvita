@@ -133,3 +133,7 @@ end
 function cdofile(f)
     assert(love.filesystem.load(f))()
 end
+
+function dbgprint(str)
+    love.graphics.print(str, 0, 0)
+end

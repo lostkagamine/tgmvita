@@ -258,6 +258,10 @@ end
 function game:update(dt)
     cTimer.update(self.timer, dt)
 
+    if mode.update then
+        mode:update()
+    end
+
     if justpressed.hold then
         self:hold()
     end
@@ -705,7 +709,7 @@ function update(dt)
             state = 'rotselect'
         end
     elseif state == 'menu' then
-        local modes = {'script/mode_master.lua', 'script/mode_death.lua'}
+        local modes = {'script/mode_master.lua', 'script/mode_master2.lua', 'script/mode_death.lua'}
         local MODE_NUMBER = #modes
         if justpressed.down then
             menuselect = menuselect + 1
@@ -949,6 +953,7 @@ function draw(dt)
     if state == 'menu' then
         local f = {
             'Master',
+            'Master II',
             'T.A. Death'
         }
         for i, j in ipairs(f) do

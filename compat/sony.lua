@@ -142,3 +142,7 @@ end
 function cdofile(f)
     dofile(f)
 end
+
+function dbgprint(str)
+    Graphics.debugPrint(str, 0, 0, newColour(255, 255, 255))
+end
